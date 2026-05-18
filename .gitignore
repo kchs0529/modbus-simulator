@@ -1,0 +1,51 @@
+# ===========================
+# Java / Gradle
+# ===========================
+modbus-simulator/build/
+modbus-simulator/.gradle/
+!modbus-simulator/gradle/wrapper/gradle-wrapper.jar
+*.class
+*.log
+
+# ===========================
+# React / Node
+# ===========================
+modbus-ui/node_modules/
+modbus-ui/dist/
+
+# Vite 빌드 결과물 (npm run build → Spring Boot static으로 출력됨, 재생성 가능)
+modbus-simulator/src/main/resources/static/
+
+# ===========================
+# 배포 빌드 결과물
+# ===========================
+dist/
+
+# ===========================
+# IntelliJ IDEA
+# ===========================
+.idea/
+*.iml
+*.iws
+*.ipr
+out/
+
+# ===========================
+# Claude Code 설정
+# ===========================
+.claude/
+
+# ===========================
+# OS
+# ===========================
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ===========================
+# 환경 설정 (민감 정보)
+# ===========================
+*.env
+.env.local
+application-local.yml
+application-secret.yml

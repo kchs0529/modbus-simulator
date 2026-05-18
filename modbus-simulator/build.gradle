@@ -1,0 +1,79 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '3.2.5'
+    id 'io.spring.dependency-management' version '1.1.5'
+}
+
+group = 'com.drimsys'
+version = '1.0.0'
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    // Spring Boot Web (REST API)
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+
+    // j2mod: Modbus TCP + RTU 지원
+    implementation 'com.ghgande:j2mod:3.2.1'
+
+    // jSerialComm: RTU 시리얼 포트
+    implementation 'com.fazecast:jSerialComm:2.10.4'
+
+    // Lombok
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}
+
+// React 빌드 → Spring Boot static 폴더로 자동 출력
+// gradlew build -PskipNpm 으로 생략 가능
+task npmBuild(type: Exec) {
+    group = 'build'
+    description = 'React 프론트엔드 빌드 (npm run build)'
+    workingDir '../modbus-ui'
+    commandLine 'cmd', '/c', 'npm run build'
+    onlyIf { !project.hasProperty('skipNpm') }
+}
+processResources.dependsOn npmBuild
+
+task release(type: Exec, dependsOn: bootJar) {
+    group = 'distribution'
+    description = 'Windows 배포용 실행파일 생성 (JRE 번들 포함)'
+    def jpackage = "${System.getenv('JAVA_HOME') ?: (System.getProperties()['java.home'])}/bin/jpackage"
+    def distDir = layout.projectDirectory.dir('../dist').asFile.absolutePath
+
+    doFirst {
+        delete distDir
+        mkdir distDir
+    }
+
+    commandLine jpackage,
+        '--input',        layout.buildDirectory.dir('libs').get().asFile.absolutePath,
+        '--name',         'ModbusSimulator',
+        '--main-jar',     "modbus-simulator-${version}.jar",
+        '--type',         'app-image',
+        '--dest',         distDir,
+        '--app-version',  version,
+        '--description',  'Modbus TCP/RTU Slave Simulator',
+        '--java-options', '-Dmodbus.desktop=true',
+        '--java-options', '-Dfile.encoding=UTF-8'
+}

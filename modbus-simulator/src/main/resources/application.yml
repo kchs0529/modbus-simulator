@@ -1,0 +1,23 @@
+server:
+  port: 8080
+
+modbus:
+  tcp:
+    enabled: true
+    port: 502          # Modbus TCP 표준 포트 (권한 없으면 5020 등으로 변경)
+    unit-id: 1
+  rtu:
+    enabled: false     # RTU는 기본 비활성 (시리얼 포트 있을 때 true로)
+    port-name: "COM3"  # Windows: COM3, Linux: /dev/ttyUSB0
+    baud-rate: 9600
+    data-bits: 8
+    stop-bits: 1
+    parity: 0          # 0=None, 1=Odd, 2=Even
+    unit-id: 1
+
+  # 초기 레지스터 크기 (Modbus 5자리 주소 공간: 00001~09999 등)
+  register:
+    coil-count: 9999
+    discrete-input-count: 9999
+    holding-register-count: 9999
+    input-register-count: 9999
